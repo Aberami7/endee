@@ -1,4 +1,4 @@
-                                                        🚀 CareerFlow AI – AI-Based Career Recommendation System using Endee
+                                             CareerFlow AI – AI-Based Career Recommendation System using Endee
 
 ## 📌 Project Overview
 
