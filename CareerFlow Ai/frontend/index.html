@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerFlow AI | Professional RAG Mentor</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #020617;
+            --sidebar-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.5);
+            --accent: #22d3ee; /* Cyber Cyan */
+            --accent-glow: rgba(34, 211, 238, 0.3);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            background-image: radial-gradient(circle at top right, rgba(34, 211, 238, 0.05), transparent),
+                              radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.05), transparent);
+            min-height: 100vh;
+        }
+
+        .dashboard { display: flex; }
+
+        /* Modern Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 3.5rem; }
+        .logo-icon { 
+            background: linear-gradient(135deg, var(--accent), #3b82f6); 
+            color: #000; padding: 12px; border-radius: 14px; 
+            font-weight: 900; box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .logo h2 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; }
+
+        .nav-links { list-style: none; flex-grow: 1; }
+        .nav-item { 
+            padding: 14px 18px; border-radius: 12px; margin-bottom: 8px; 
+            cursor: pointer; color: var(--text-muted); transition: 0.3s;
+            display: flex; align-items: center; gap: 12px; font-weight: 500;
+        }
+        .nav-item.active { background: rgba(34, 211, 238, 0.1); color: var(--accent); border: 1px solid rgba(34, 211, 238, 0.2); }
+        .nav-item:hover:not(.active) { color: var(--text-main); background: rgba(255, 255, 255, 0.05); }
+
+        .server-status { 
+            font-size: 0.85rem; display: flex; align-items: center; gap: 12px; 
+            color: #10b981; background: rgba(16, 185, 129, 0.1); 
+            padding: 12px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* Main Content */
+        .main-content { flex: 1; margin-left: 280px; padding: 4rem; width: calc(100% - 280px); }
+        .header { margin-bottom: 4rem; }
+        .header h1 { 
+            font-size: 3rem; font-weight: 800; margin-bottom: 16px; 
+            background: linear-gradient(to right, #fff, var(--accent)); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
+        .header p { color: var(--text-muted); font-size: 1.15rem; max-width: 600px; }
+
+        .card { 
+            background: var(--card-bg); border-radius: 30px; border: 1px solid var(--border);
+            padding: 3rem; backdrop-filter: blur(20px); 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); margin-bottom: 3rem;
+            position: relative; overflow: hidden;
+        }
+
+        .input-group { display: flex; gap: 12px; margin-top: 2rem; position: relative; z-index: 2; }
+        input { 
+            flex: 1; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border); 
+            padding: 20px 28px; border-radius: 20px; color: white; outline: none; 
+            transition: 0.4s; font-size: 1.1rem;
+        }
+        input:focus { border-color: var(--accent); background: rgba(15, 23, 42, 0.9); box-shadow: 0 0 0 5px rgba(34, 211, 238, 0.1); }
+
+        button { 
+            background: var(--accent); color: #000; border: none; padding: 0 40px;
+            border-radius: 20px; font-weight: 800; cursor: pointer; transition: 0.3s; 
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
+        }
+        button:hover { transform: scale(1.02); box-shadow: 0 0 30px var(--accent-glow); }
+
+        /* Results Display */
+        .hidden { display: none; }
+        #resultArea { animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        .badge { 
+            background: rgba(34, 211, 238, 0.15); color: var(--accent); 
+            padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; 
+            font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+            border: 1px solid rgba(34, 211, 238, 0.3);
+        }
+
+        .role-title { font-size: 2.2rem; color: #fff; margin: 2rem 0 1rem 0; font-weight: 800; }
+        .divider { height: 2px; background: linear-gradient(to right, var(--accent), transparent); width: 100px; margin: 1.5rem 0; }
+        .label { color: var(--accent); font-size: 0.9rem; font-weight: 900; text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 2px; }
+        .content-text { font-size: 1.2rem; color: var(--text-main); line-height: 1.7; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; border-left: 4px solid var(--accent); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Loader Animation */
+        .loader-spin {
+            width: 40px; height: 40px; border: 4px solid rgba(34, 211, 238, 0.1);
+            border-top: 4px solid var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <h2>CareerFlow AI</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active"><i class="fas fa-compass"></i> Discovery</li>
+                <li class="nav-item"><i class="fas fa-chart-line"></i> Analytics</li>
+                <li class="nav-item"><i class="fas fa-graduation-cap"></i> Academy</li>
+            </ul>
+            <div class="server-status">
+                <span class="dot"></span> <span>Engine Status: Online</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1>Unlock Your Potential</h1>
+                <p>Advanced RAG-based career matching using high-dimensional vector embeddings and semantic similarity.</p>
+            </header>
+
+            <section class="card">
+                <span class="badge"><i class="fas fa-bolt"></i> Vector Search Enabled</span>
+                <div class="input-group">
+                    <input type="text" id="userInput" placeholder="Search a role (e.g. 'full stack developer')">
+                    <button id="searchBtn" onclick="getGuidance()">Analyze</button>
+                </div>
+            </section>
+
+            <section id="resultArea" class="card hidden">
+                <div id="loader" class="hidden">
+                    <div class="loader-spin"></div>
+                    <p style="text-align:center; color: var(--accent); font-weight: 600;">Mapping latent space for matches...</p>
+                </div>
+                <div id="mainResult" class="hidden">
+                    <span class="badge">Match Confidence: High</span>
+                    <h2 id="resRole" class="role-title"></h2>
+                    <div class="divider"></div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <span class="label">Primary Tech Stack</span>
+                        <p id="resPath" class="content-text"></p>
+                    </div>
+                    
+                    <div>
+                        <span class="label">Career Trajectory</span>
+                        <p id="resDesc" class="content-text" style="border-left-color: #3b82f6;"></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        async function getGuidance() {
+            const query = document.getElementById('userInput').value;
+            const resArea = document.getElementById('resultArea');
+            const mainResult = document.getElementById('mainResult');
+            const loader = document.getElementById('loader');
+            const btn = document.getElementById('searchBtn');
+
+            if (!query) {
+                alert("Please describe your career path!");
+                return;
+            }
+
+            resArea.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            mainResult.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+                console.log("Vector Data:", data);
+
+                if (data.results && data.results.length > 0) {
+                    const topMatch = data.results[0].metadata;
+
+                    document.getElementById('resRole').innerText = topMatch.problem || "New Horizon Found";
+                    document.getElementById('resPath').innerText = topMatch.solution || "Technical details loading...";
+                    document.getElementById('resDesc').innerText = topMatch.explanation || "No description available in this node.";
+
+                    loader.classList.add('hidden');
+                    mainResult.classList.remove('hidden');
+                    
+                    // Smooth scroll to result
+                    resArea.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert("No semantic match in current cluster. Check Endee Commit logs!");
+                    resArea.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error("Connection Refused:", error);
+                alert("Backend Connection Lost. Ensure app.py is active.");
+                resArea.classList.add('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Analyze";
+            }
+        }
+    </script>
+</body>
+</html>
