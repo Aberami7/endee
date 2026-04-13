@@ -18,9 +18,9 @@ def agent(query):
 # ---------------- FORMAT OUTPUT (RAG Logic) ----------------
 def format_response(results):
     if not results or len(results) == 0:
-        return "😔 I couldn't find a specific career match for that. Try searching for 'Cloud', 'Frontend', or 'Security'."
+        return " I couldn't find a specific career match for that. Try searching for 'Cloud', 'Frontend', or 'Security'."
 
-    output = "🎯 **Best Career Match Found:**\n"
+    output = " **Best Career Match Found:**\n"
     output += "-----------------------------------\n"
 
     # Endee returns a list of matches. We take the top one (index 0).
@@ -32,14 +32,10 @@ def format_response(results):
     path = metadata.get('solution', 'Path details coming soon.')
     desc = metadata.get('explanation', 'Professional career path.')
 
-    output += f"👤 **Role:** {role}\n"
-    output += f"📚 **Learning Path:** {path}\n"
-    output += f"📝 **Description:** {desc}\n"
+    output += f" **Role:** {role}\n"
+    output += f" **Learning Path:** {path}\n"
+    output += f" **Description:** {desc}\n"
     output += "-----------------------------------\n"
-    output += "💡 *Tip: Focus on these skills to get hired fast!*"
+    output += " *Tip: Focus on these skills to get hired fast!*"
 
     return output
-
-# Test the agent locally (Optional)
-if __name__ == "__main__":
-    print(agent("I want to work with AWS and servers"))
