@@ -77,7 +77,17 @@ Reason: Matches analytical and statistical skills
 CareerFlow AI demonstrates how **vector databases like Endee** can be used to build intelligent recommendation systems using semantic understanding.
 It leverages a **RAG (Retrieval-Augmented Generation) pipeline** to improve the relevance and accuracy of career suggestions.
 
+## Dashboard page
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/b256b6ac-eaa5-49d1-8f08-080d515e1ae1" />
 
-## 🙌 Author
+## Search Page
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/b99208a7-137a-49fa-8dc1-73304745b2af" />
 
-Aberami
+## Endee Database 
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/c398fa79-5b46-4b51-a911-b198fffd38ff" />
+
+## 200 Response
+<img width="1920" height="1020" alt="Screenshot 2026-04-13 144911" src="https://github.com/user-attachments/assets/69c24594-e637-489f-b0bc-bb5a97e32038" />
+
+
+
