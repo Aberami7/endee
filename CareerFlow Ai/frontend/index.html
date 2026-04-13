@@ -10,7 +10,7 @@
             --bg-color: #020617;
             --sidebar-bg: #0f172a;
             --card-bg: rgba(30, 41, 59, 0.5);
-            --accent: #22d3ee; /* Cyber Cyan */
+            --accent: #22d3ee; 
             --accent-glow: rgba(34, 211, 238, 0.3);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -25,11 +25,11 @@
             background-image: radial-gradient(circle at top right, rgba(34, 211, 238, 0.05), transparent),
                               radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.05), transparent);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .dashboard { display: flex; }
 
-        /* Modern Sidebar */
         .sidebar {
             width: 280px;
             background-color: var(--sidebar-bg);
@@ -68,7 +68,6 @@
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* Main Content */
         .main-content { flex: 1; margin-left: 280px; padding: 4rem; width: calc(100% - 280px); }
         .header { margin-bottom: 4rem; }
         .header h1 { 
@@ -83,6 +82,14 @@
             padding: 3rem; backdrop-filter: blur(20px); 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); margin-bottom: 3rem;
             position: relative; overflow: hidden;
+        }
+
+        /* FIXED: Added max-height and scroll for content stability */
+        #resultArea { 
+            max-height: 80vh; 
+            overflow-y: auto; 
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
         }
 
         .input-group { display: flex; gap: 12px; margin-top: 2rem; position: relative; z-index: 2; }
@@ -100,10 +107,8 @@
         }
         button:hover { transform: scale(1.02); box-shadow: 0 0 30px var(--accent-glow); }
 
-        /* Results Display */
         .hidden { display: none; }
-        #resultArea { animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
-
+        
         .badge { 
             background: rgba(34, 211, 238, 0.15); color: var(--accent); 
             padding: 8px 20px; border-radius: 50px; font-size: 0.85rem; 
@@ -118,7 +123,6 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Loader Animation */
         .loader-spin {
             width: 40px; height: 40px; border: 4px solid rgba(34, 211, 238, 0.1);
             border-top: 4px solid var(--accent); border-radius: 50%;
@@ -148,7 +152,7 @@
         <main class="main-content">
             <header class="header">
                 <h1>Unlock Your Potential</h1>
-                <p>Advanced RAG-based career matching using high-dimensional vector embeddings and semantic similarity.</p>
+                <p>Advanced RAG-based career matching using high-dimensional vector embeddings.</p>
             </header>
 
             <section class="card">
@@ -209,28 +213,29 @@
                     body: JSON.stringify({ query: query })
                 });
 
+                if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
                 const data = await response.json();
-                console.log("Vector Data:", data);
+                console.log("Response from Backend:", data);
 
-                if (data.results && data.results.length > 0) {
-                    const topMatch = data.results[0].metadata;
+                if (data.status === "success" && data.results && data.results.length > 0) {
+                    const topMatch = data.results[0];
 
-                    document.getElementById('resRole').innerText = topMatch.problem || "New Horizon Found";
-                    document.getElementById('resPath').innerText = topMatch.solution || "Technical details loading...";
-                    document.getElementById('resDesc').innerText = topMatch.explanation || "No description available in this node.";
+                    // Fixed mapping: Assuming backend returns {role, path, brief}
+                    document.getElementById('resRole').innerText = topMatch.role || "Match Found";
+                    document.getElementById('resPath').innerText = topMatch.path || "Technical data loading...";
+                    document.getElementById('resDesc').innerText = topMatch.brief || "No trajectory info available.";
 
                     loader.classList.add('hidden');
                     mainResult.classList.remove('hidden');
-                    
-                    // Smooth scroll to result
                     resArea.scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    alert("No semantic match in current cluster. Check Endee Commit logs!");
+                    alert("No semantic match found.");
                     resArea.classList.add('hidden');
                 }
             } catch (error) {
-                console.error("Connection Refused:", error);
-                alert("Backend Connection Lost. Ensure app.py is active.");
+                console.error("Connection Error:", error);
+                alert("Connection lost. Ensure app.py is running on Port 5000.");
                 resArea.classList.add('hidden');
             } finally {
                 btn.disabled = false;
